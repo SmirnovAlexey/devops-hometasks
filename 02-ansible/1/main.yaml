@@ -1,0 +1,69 @@
+---
+- name: Main provision
+  hosts: main
+  become: yes
+  vars:
+    port1: "8080"
+    site1: "domain_1"
+    deffpage1: "index.html"
+
+    port2: "8081"
+    site2: "domain_2"
+    deffpage2: "index.php"
+
+    configtemplate: "/vagrant/conf/site.conf"
+
+  tasks:
+  - name: install packages
+    apt:
+      pkg:
+      - apache2
+      - php7.4
+      - libapache2-mod-php7.4      
+      state: present
+
+  - name: enable the apache2 module php
+    apache2_module:
+      state: present
+      name: php7.4
+    notify:
+      - restart apache2  
+
+  - name: add apache ports
+    lineinfile:
+      dest: "/etc/apache2/ports.conf"
+      insertafter: "Listen 80"
+      line: "{{ item }}"
+    with_items:
+      - 'Listen {{ port1  }}'
+      - 'Listen {{ port2  }}'
+    notify:
+      - restart apache2  
+
+  - name: add pages
+    copy:
+      src: "/vagrant/{{ item.site }}/html"
+      dest: "/var/www/{{ item.site }}"
+    loop:
+      - { site: "{{ site1 }}" }
+      - { site: "{{ site2 }}" }
+
+  - name: add configs
+    template:
+      src: "{{ configtemplate }}"
+      dest: "/etc/apache2/sites-available/{{ item.site }}.conf"
+    loop:
+      - { port: "{{ port1 }}", site: "{{ site1 }}", page: "{{ deffpage1 }}" }
+      - { port: "{{ port2 }}", site: "{{ site2 }}", page: "{{ deffpage2 }}" }
+
+  - name: run a2ensite 
+    command: a2ensite {{ item.site }}.conf
+    loop:
+      - { site: "{{ site1 }}" }
+      - { site: "{{ site2 }}" }
+    notify:
+      - restart apache2
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted

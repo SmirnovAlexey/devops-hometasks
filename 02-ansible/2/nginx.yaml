@@ -1,0 +1,28 @@
+---
+- name: Nginx provision
+  hosts: main
+  become: yes
+
+  tasks:
+  - name: install packages
+    apt:
+      pkg:
+      - nginx
+      - mc
+      state: present
+
+  - name: add new config
+    copy:
+      src: "/vagrant/conf/nginx.conf"
+      dest: "/etc/nginx/sites-available/default"
+    notify:
+      - restart nginx
+
+  # - name: change default config nginx 
+  #   command: nginx -c /etc/nginx/sites-available/nginx.conf
+  #   notify:
+  #     - restart nginx
+
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted

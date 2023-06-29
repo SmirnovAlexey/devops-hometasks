@@ -1,0 +1,41 @@
+---
+- name: Static provision
+  hosts: main
+  become: yes
+  vars:
+    port: "80"
+    site: "domain_1"
+    page: "index.html"
+
+    configtemplate: "/vagrant/conf/site.conf"
+
+  tasks:
+  - name: install packages
+    apt:
+      pkg:
+      - apache2
+      state: present
+
+  - name: add pages
+    copy:
+      src: "/vagrant/{{ site }}/html"
+      dest: "/var/www/{{ site }}"
+
+  - name: add config
+    template:
+      src: "{{ configtemplate }}"
+      dest: "/etc/apache2/sites-available/{{ site }}.conf"
+
+  - name: run a2disite 
+    command: a2dissite 000-default.conf
+    notify:
+      - restart apache2
+
+  - name: run a2ensite 
+    command: a2ensite {{ site }}.conf
+    notify:
+      - restart apache2
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
