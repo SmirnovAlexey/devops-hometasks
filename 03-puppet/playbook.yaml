@@ -1,0 +1,155 @@
+---
+- name: Master provision
+  hosts: master
+  become: yes
+
+  tasks:
+  - name: Set a hostname
+    hostname:
+      name: "{{ inventory_hostname }}" #master.puppet
+
+  - name: Import a key from a url
+    rpm_key:
+      key: https://yum.puppet.com/RPM-GPG-KEY-puppet-20250406
+      state: present
+
+  - name: Copy rpm file to server
+    get_url:
+      url: https://yum.puppet.com/puppet-release-el-7.noarch.rpm
+      dest: /tmp/puppet7.rpm
+
+  - name: Install rpm 
+    yum:
+      name: /tmp/puppet7.rpm
+      state: present
+
+  - name: Install packages
+    yum:
+      name:
+      - vim
+      - mc
+      - puppetserver
+      - git
+      - gem
+      state: present
+
+  - name: Enable port 8140
+    firewalld:
+      zone: public
+      port: 8140/tcp
+      permanent: true
+      state: enabled
+
+  - name: Add server host
+    lineinfile:
+      path: "/etc/hosts"
+      line: "{{ master_puppet_ip }} master.puppet"
+
+  - name: Copy puppet.conf
+    copy:
+      src: /vagrant/master/puppet.conf
+      dest: /etc/puppetlabs/puppet/puppet.conf
+
+  - name: Copy autosign.conf
+    copy:
+      src: /vagrant/master/autosign.conf
+      dest: /etc/puppetlabs/puppet/autosign.conf
+
+  - name: Copy puppetserver
+    copy:
+      src: /vagrant/master/puppetserver
+      dest: /etc/sysconfig/puppetserver
+
+  - name: Update PATH
+    shell: echo "PATH=/opt/puppetlabs/bin:/opt/puppetlabs/puppet/bin:$PATH" > /etc/environment
+
+  - name: Install r10k
+    command: gem install r10k
+    become_user: root
+
+  - name: Ensures r10k dir exists
+    file: 
+      path: /etc/puppetlabs/r10k
+      state: directory
+
+  - name: Copy r10k settings
+    copy:
+      src: /vagrant/master/r10k.yaml
+      dest: /etc/puppetlabs/r10k/r10k.yaml
+
+  - name: Enable service puppetserver and started
+    service:
+      name: puppetserver
+      enabled: yes      
+      state: started
+
+  - name: Restarted service firewalld
+    service:
+      name: firewalld
+      state: restarted
+
+  - name: Cron for r10k
+    cron:
+      name: "cron for r10k"
+      minute: "*/2"
+      job: "/opt/puppetlabs/puppet/bin/r10k deploy environment -p"
+
+- name: Slave provision
+  hosts: slave
+  become: yes
+
+  tasks:
+  - name: Set a hostname
+    hostname:
+      name: "{{ inventory_hostname }}" #slave1.puppet
+
+  - name: Import a key from a url
+    rpm_key:
+      key: https://yum.puppet.com/RPM-GPG-KEY-puppet-20250406
+      state: present
+
+  - name: Copy rpm file to server
+    get_url:
+      url: https://yum.puppet.com/puppet-release-el-7.noarch.rpm
+      dest: /tmp/puppet7.rpm
+
+  - name: Install rpm 
+    yum:
+      name: /tmp/puppet7.rpm
+      state: present
+
+  - name: Install packages
+    yum:
+      name:
+      - vim
+      - mc
+      - puppet-agent
+      state: present
+
+  - name: Add server host
+    lineinfile:
+      path: "/etc/hosts"
+      line: "{{ master_puppet_ip }} master.puppet"
+
+  - name: Copy puppet.conf
+    copy:
+      src: /vagrant/slave/puppet.conf
+      dest: /etc/puppetlabs/puppet/puppet.conf
+
+  - name: Enable port 80
+    firewalld:
+      zone: public
+      port: 80/tcp
+      permanent: true
+      state: enabled
+
+  - name: Restarted service firewalld
+    service:
+      name: firewalld
+      state: restarted
+
+  - name: Enable service puppet and restarted
+    service:
+      name: puppet
+      enabled: yes      
+      state: restarted
