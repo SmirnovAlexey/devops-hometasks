@@ -1,0 +1,20 @@
+---
+jenkins_home: "/var/lib/jenkins"
+
+jenkins_user: "admin"
+jenkins_password: "admin"
+
+jenkins_config_owner: "jenkins"
+jenkins_config_group: "jenkins"
+
+jenkins_url: "http://localhost:8080"
+jenkins_updates_url: "https://updates.jenkins.io"
+
+jenkins_plugin_timeout : 300
+
+jenkins_plugin: "credentials-binding,credentials,plain-credentials,git-client,ssh-credentials,workflow-scm-step,pipeline,ssh,sshd,ssh-slaves,timestamper,golang,locale,ws-cleanup,git,nexus-artifact-uploader,configuration-as-code" 
+ansible_apt_packages: "mc,curl,apt-transport-https,gnupg,openjdk-11-jre,fontconfig,build-essential,git" 
+
+jobs:
+  - name: FirstJob
+    filename: FirstJob.xml

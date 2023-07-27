@@ -1,0 +1,10 @@
+---
+- name: Jenkins provision
+  hosts: jenkins
+  become: yes
+
+  roles:
+  - jenkins
+
+
+

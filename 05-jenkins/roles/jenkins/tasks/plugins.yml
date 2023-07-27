@@ -1,0 +1,27 @@
+---
+- name: Install Jenkins plugins using password
+  jenkins_plugin:
+    name: "{{ item }}"
+    jenkins_home: "{{ jenkins_home }}"
+    url_username: "{{ jenkins_user }}"
+    url_password: "{{ jenkins_password }}"
+    state: present
+    timeout: "{{ jenkins_plugin_timeout }}"
+    updates_url: "{{ jenkins_updates_url }}"
+    url: "{{ jenkins_url }}"
+    with_dependencies: true
+  with_items: "{{ jenkins_plugin.split(',') }}"
+  notify: restart jenkins
+  register: plugin_result
+  until: plugin_result is success
+  retries: 3
+  delay: 2
+
+- name: configure configuration-as-code
+  template:
+    src: jenkins.yaml
+    dest: "{{ jenkins_home }}/jenkins.yaml"
+  notify: restart jenkins   
+
+- name: Flush handlers
+  meta: flush_handlers

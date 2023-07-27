@@ -1,0 +1,17 @@
+---
+- name: Ensures jobs dir exists
+  file: 
+    path: "{{ jenkins_home }}/jobs/{{ item.name }}"
+    state: directory   
+    owner: "{{ jenkins_config_owner }}"
+    group: "{{ jenkins_config_group }}"
+  loop: "{{ jobs }}"
+
+- name: Add jobs
+  template:
+    src: "{{ item.filename }}"
+    dest: "{{ jenkins_home }}/jobs/{{ item.name }}/config.xml"
+    owner: "{{ jenkins_config_owner }}"
+    group: "{{ jenkins_config_group }}"
+  loop: "{{ jobs }}"
+  notify: restart jenkins 
