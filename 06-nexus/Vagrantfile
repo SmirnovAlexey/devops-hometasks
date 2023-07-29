@@ -1,0 +1,81 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "generic/debian11"
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus   = 2
+        vb.memory = 1536
+    end 
+
+    config.vm.define "jenkins.vm" do |jenkins|
+        jenkins.vm.network "private_network", ip: "192.168.35.10"
+        jenkins.vm.hostname = "jenkins.vm"
+        jenkins.vm.provider "virtualbox" do |vb|
+            vb.name = jenkins.vm.hostname
+        end        
+
+        jenkins.vm.provision "ansible_local" do |ansible|
+            ansible.galaxy_role_file = 'roles/requirements.yml'
+            ansible.playbook = "playbook.yaml"
+            ansible.inventory_path = "inventory"
+            ansible.compatibility_mode = "2.0"
+        end    
+    
+    end 
+
+    config.vm.define "nexus.vm" do |nexus|
+        nexus.vm.network "private_network", ip: "192.168.35.11"
+        nexus.vm.network "forwarded_port", guest: 8081, host: 8091
+        nexus.vm.hostname = "nexus.vm"
+        nexus.vm.provider "virtualbox" do |vb|
+            vb.name = nexus.vm.hostname
+        end        
+
+        nexus.vm.provision "ansible_local" do |ansible|
+            ansible.galaxy_role_file = 'roles/requirements.yml'
+            ansible.playbook = "playbook.yaml"
+            ansible.inventory_path = "inventory"
+            ansible.compatibility_mode = "2.0"
+        end    
+    
+    end 
+
+    config.vm.define "staging.vm" do |deploy|
+        deploy.vm.box = "debian/buster64"
+        deploy.vm.network "private_network", ip: "192.168.35.12"
+        deploy.vm.hostname = "staging.vm"
+        deploy.vm.provider "virtualbox" do |vb|
+            vb.name = deploy.vm.hostname
+            vb.memory = 256
+            vb.cpus   = 1
+        end        
+
+        deploy.vm.provision "ansible_local" do |ansible|
+            ansible.galaxy_role_file = 'roles/requirements.yml'
+            ansible.playbook = "playbook.yaml"
+            ansible.inventory_path = "inventory"
+            ansible.compatibility_mode = "2.0"
+        end    
+
+    end 
+
+    config.vm.define "production.vm" do |deploy|
+        deploy.vm.box = "debian/buster64"
+        deploy.vm.network "private_network", ip: "192.168.35.13"
+        deploy.vm.hostname = "production.vm"
+        deploy.vm.provider "virtualbox" do |vb|
+            vb.name = deploy.vm.hostname
+            vb.memory = 256
+            vb.cpus   = 1
+        end        
+
+        deploy.vm.provision "ansible_local" do |ansible|
+            ansible.galaxy_role_file = 'roles/requirements.yml'
+            ansible.playbook = "playbook.yaml"
+            ansible.inventory_path = "inventory"
+            ansible.compatibility_mode = "2.0"
+        end    
+
+    end 
+
+end

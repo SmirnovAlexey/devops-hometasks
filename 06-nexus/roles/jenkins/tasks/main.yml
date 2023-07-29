@@ -1,0 +1,9 @@
+---
+- name: Install Jenkins
+  include_tasks: install.yml
+
+- name: Install Jenkins plugins
+  include_tasks: plugins.yml
+
+- name: Install Jenkins jobs
+  include_tasks: jobs.yml
