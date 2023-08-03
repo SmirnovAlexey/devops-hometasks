@@ -1,0 +1,22 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "generic/debian11"
+    config.vm.synced_folder ".", "/vagrant", type: "rsync"
+
+    config.vm.provider "virtualbox" do |vb|
+        vb.cpus   = 2
+        vb.memory = 2048
+    end 
+
+    config.vm.define "docker.vm" do |docker|
+        docker.vm.network "private_network", ip: "192.168.35.20"
+        docker.vm.hostname = "docker.vm"
+        docker.vm.provider "virtualbox" do |vb|
+            vb.name = docker.vm.hostname
+        end  
+
+        docker.vm.provision "shell", inline: <<-SHELL
+        apt-get update
+        apt-get install -y mc docker.io docker-compose docker-doc
+        SHELL
+    end 
+end
