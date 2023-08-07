@@ -1,0 +1,108 @@
+def testIntegration(ip, build) {
+  script {
+    final String urlVersion = "http://${ip}:8888/version"
+    final String responseVersion = sh(script: "curl -s $urlVersion", returnStdout: true).trim()
+    final String version = sh(script: "echo '$responseVersion' | jq -r '.version'", returnStdout: true).trim()
+    if ( version != build ) {
+      sh(script: "exit 99")
+    }
+                    
+    final String urlApi = "http://${ip}:8888/api"
+    final String responseApi = sh(script: "curl -s -H \"Content-Type: application/json\" -d '{\"text\":\"ths is a really really really important thing this is\"}' " + urlApi, returnStdout: true).trim()
+    final String countTag = sh(script: "echo '$responseApi' | jq '. | length'", returnStdout: true).trim()
+    if ( countTag != "7" ) {
+      sh(script: "exit 99")
+    }
+  }            
+}
+
+def deploy(ip, sshUser, nexusIp, nexusCredentialId, build) {
+  withCredentials([usernamePassword(credentialsId: nexusCredentialId, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
+    sh "ssh ${sshUser}@${ip} 'sudo service wordcloud stop'"
+    sh "ssh ${sshUser}@${ip} 'curl -X GET http://${nexusIp}:8081/repository/word-cloud-build/pipeline/word-cloud-generator/${build}/word-cloud-generator-${build}.gz -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD'"
+    sh "ssh ${sshUser}@${ip} 'ls -l /opt/wordcloud'"
+    sh "ssh ${sshUser}@${ip} 'gunzip -f /opt/wordcloud/word-cloud-generator.gz'"
+    sh "ssh ${sshUser}@${ip} 'chmod +x /opt/wordcloud/word-cloud-generator'"
+    sh "ssh ${sshUser}@${ip} 'sudo service wordcloud start'"
+  }
+}
+
+pipeline {
+    environment {
+        NEXUS_IP = '192.168.33.90'
+        STAGING_IP = '192.168.33.80'
+        PRODUCTION_IP = '192.168.33.85'
+        NEXUS_CREDENTIAL_ID = 'nexus-creds'
+        SSH_USER = 'vagrant'
+        FULL_BUILD_NUMBER = "1.${BUILD_NUMBER}"
+        GIT_REPOSITORY = 'https://github.com/SmirnovAlexey/word-cloud-generator.git'
+        GO_VERSION = 'go-1.16'
+    }
+    agent any
+    options {
+        timestamps()
+    }
+    tools { go GO_VERSION }
+    stages{
+      stage('Get code'){
+        steps{
+          git GIT_REPOSITORY
+        }
+      }
+      stage('Test'){
+        steps{
+          sh '''make lint
+                make test
+                '''
+        }
+      }
+      stage('Build'){
+        steps{
+          sh '''sed -i "s/1.DEVELOPMENT/${FULL_BUILD_NUMBER}/g" static/version
+                GOOS=linux GOARCH=amd64 go build -o ./artifacts/word-cloud-generator -v
+                gzip -f artifacts/word-cloud-generator'''
+        }
+      }
+      stage('Upload artifact'){
+        steps{
+          nexusArtifactUploader(
+              nexusVersion: 'nexus3',
+              protocol: 'http',
+              nexusUrl: "${NEXUS_IP}:8081",
+              groupId: 'pipeline',
+              version: FULL_BUILD_NUMBER,
+              repository: 'word-cloud-build',
+              credentialsId: NEXUS_CREDENTIAL_ID,
+              artifacts: [
+                  [artifactId: 'word-cloud-generator',
+                   classifier: '',
+                   file: 'artifacts/word-cloud-generator.gz',
+                   type: 'gz']
+              ]
+          )      
+        }
+      }
+      stage('Delpoy on staging'){
+        steps{
+            deploy(STAGING_IP, SSH_USER, NEXUS_IP, NEXUS_CREDENTIAL_ID, FULL_BUILD_NUMBER) 
+        }
+      }
+      stage('Test integration'){
+        steps{
+          parallel(
+            a: {
+              testIntegration(STAGING_IP, FULL_BUILD_NUMBER)
+            },
+            b: {
+              testIntegration(STAGING_IP, FULL_BUILD_NUMBER)
+            }
+          )    
+        }
+      }
+      stage('Delpoy on production'){
+        steps{
+            deploy(PRODUCTION_IP, SSH_USER, NEXUS_IP, NEXUS_CREDENTIAL_ID, FULL_BUILD_NUMBER) 
+        }
+      }
+    }
+}
