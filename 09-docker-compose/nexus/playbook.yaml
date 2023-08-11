@@ -1,0 +1,52 @@
+---
+- name: Nexus provision
+  hosts: localhost
+  become: yes
+
+  pre_tasks:
+  - name: Add key
+    apt_key:
+      url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
+
+
+  - name: Add repository
+    apt_repository:
+      repo: deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ buster main
+      state: present
+      update_cache: true
+
+  - name: Install Java
+    apt:
+      name: adoptopenjdk-8-hotspot
+      state: present
+
+  vars:
+    nexus_version: '3.58.1-01'
+    nexus_timezone: 'Europe/Minsk'
+    nexus_download_url: "http://download.sonatype.com/nexus/3"
+    nexus_download_dir: '/tmp'
+    nexus_admin_password: "admin"
+    nexus_anonymous_access: false
+    nexus_delete_default_repos: true
+    nexus_repos_raw_proxy: []
+    nexus_repos_raw_group: []
+    nexus_config_raw: true
+    nexus_repos_raw_hosted:
+      - name: word-cloud-build
+    nexus_roles:
+      - id: nx-uploader
+        name: nx-uploader
+        description: Uploader from Jenkins
+        privileges:
+          - nx-repository-view-raw-word-cloud-build-*
+    nexus_local_users:
+      - username: "{{ nexus_user }}"
+        state: present
+        first_name: Jenkins
+        last_name: CI
+        email: support@company.com
+        password: "{{ nexus_password }}"
+        roles:
+          - nx-uploader
+  roles:
+    - ansible-thoteam.nexus3-oss  

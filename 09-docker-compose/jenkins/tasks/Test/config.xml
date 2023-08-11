@@ -1,0 +1,64 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@1316.vd2290d3341a_f">
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@3731.ve4b_5b_857b_a_d3">
+    <script>pipeline {
+    environment {
+        NEXUS_CREDENTIAL_ID = &apos;nexus-creds&apos;
+        FULL_BUILD_NUMBER = &quot;1.${BUILD_NUMBER}&quot;
+        GIT_REPOSITORY = &apos;https://github.com/SmirnovAlexey/word-cloud-generator.git&apos;
+        GO_VERSION = &apos;go-1.16&apos;
+    }
+    agent any
+    options {
+        timestamps()
+    }
+    tools { go GO_VERSION }
+    stages{
+      stage(&apos;Get code&apos;){
+        steps{
+          git GIT_REPOSITORY
+        }
+      }
+      stage(&apos;Test&apos;){
+        steps{
+          sh &apos;&apos;&apos;make lint
+                make test
+                &apos;&apos;&apos;
+        }
+      }
+      stage(&apos;Build&apos;){
+        steps{
+          sh &apos;&apos;&apos;sed -i &quot;s/1.DEVELOPMENT/${FULL_BUILD_NUMBER}/g&quot; static/version
+                GOOS=linux GOARCH=amd64 go build -o ./artifacts/word-cloud-generator -v
+                gzip -f artifacts/word-cloud-generator&apos;&apos;&apos;
+        }
+      }
+      stage(&apos;Upload artifact&apos;){
+        steps{
+          nexusArtifactUploader(
+              nexusVersion: &apos;nexus3&apos;,
+              protocol: &apos;http&apos;,
+              nexusUrl: &quot;${NEXUS_IP}:8081&quot;,
+              groupId: &apos;pipeline&apos;,
+              version: FULL_BUILD_NUMBER,
+              repository: &apos;word-cloud-build&apos;,
+              credentialsId: NEXUS_CREDENTIAL_ID,
+              artifacts: [
+                  [artifactId: &apos;word-cloud-generator&apos;,
+                   classifier: &apos;&apos;,
+                   file: &apos;artifacts/word-cloud-generator.gz&apos;,
+                   type: &apos;gz&apos;]
+              ]
+          )
+        }
+      }
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

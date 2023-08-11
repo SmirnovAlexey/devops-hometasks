@@ -1,0 +1,31 @@
+version: "3.3"
+services:
+  jenkins:
+    build:
+      context: ./jenkins
+      dockerfile: Dockerfile.jenkins
+    environment:
+      JENKINS_ADMIN_ID: 'admin'
+      JENKINS_ADMIN_PASSWORD: 'admin'
+      NEXUS_IP: 'nexus'
+      NEXUS_USER_NAME: 'uploader'
+      NEXUS_PASSWORD: 'uploader'      
+    networks:
+      - jenkins-nexus
+    ports:
+      - "80:8080"
+    depends_on:
+      - nexus
+
+  nexus:
+    build:
+      context: ./nexus
+      dockerfile: Dockerfile.nexus
+    tty: true  
+    ports:
+      - "81:8081"
+    networks:
+      - jenkins-nexus      
+
+networks:
+  jenkins-nexus:

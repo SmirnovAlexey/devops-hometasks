@@ -1,0 +1,9 @@
+FROM debian:11
+USER root
+RUN apt-get update && apt-get install -y ansible gpg rsync && apt-get clean
+WORKDIR /tmp/playbook/
+COPY playbook.yaml inventory ./
+RUN ansible-galaxy install ansible-thoteam.nexus3-oss
+RUN ansible-playbook -i inventory playbook.yaml
+EXPOSE 8081
+ENTRYPOINT service nexus start && bash

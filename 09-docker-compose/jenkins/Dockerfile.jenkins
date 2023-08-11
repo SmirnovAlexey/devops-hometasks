@@ -1,0 +1,10 @@
+FROM jenkins/jenkins:jdk11
+USER root
+RUN apt-get update && apt-get install -y build-essential && apt-get clean
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
+ENV CASC_JENKINS_CONFIG /var/jenkins_home/casc.yaml
+COPY --chown=jenkins:jenkins plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
+COPY casc.yaml /var/jenkins_home/casc.yaml
+COPY --chown=jenkins:jenkins tasks/ /var/jenkins_home/jobs/
+EXPOSE 8080

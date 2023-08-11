@@ -1,0 +1,15 @@
+credentials-binding
+credentials
+plain-credentials
+git-client
+workflow-scm-step
+timestamper
+golang
+locale
+ws-cleanup
+git
+nexus-artifact-uploader
+configuration-as-code
+pipeline-stage-view
+workflow-aggregator
+matrix-auth
