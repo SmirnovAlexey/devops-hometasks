@@ -11,12 +11,20 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build ./07-docker -t wcg -f ./07-docker/Dockerfile.multi
+    # - name: Build the Docker image
+    #   run: docker build ./07-docker -t wcg -f ./07-docker/Dockerfile.multi
           
-
-    # - name: upload artifact
-    #   run: |
-    #     curl -u ${{ secrets.NEXUS_USER }}:${{ secrets.NEXUS_PASSWORD }} --upload-file artifacts/linux/word-cloud-generator \
-    #       http://46.56.80.84:8091/repository/word-cloud-build/github/test/2.0/word-cloud-generator.gz
-
+    - name: Log in to the Container registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        push: true
+        tags: wcg1
+        labels: wcg
