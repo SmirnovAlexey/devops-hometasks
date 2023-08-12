@@ -13,7 +13,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build /07-docker -t wcg -f Dockerfile.multi
+      run: docker version
+      # run: docker build /07-docker -t wcg -f Dockerfile.multi
           
 
     # - name: upload artifact
