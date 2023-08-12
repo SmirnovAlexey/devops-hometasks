@@ -24,7 +24,8 @@ jobs:
     - name: Build and push Docker images
       uses: docker/build-push-action@v3
       with:
-        context: .
+        context: ./07-docker
+        file: Dockerfile.multi
         push: true
         tags: wcg1
         labels: wcg
