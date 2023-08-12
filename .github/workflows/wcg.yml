@@ -5,7 +5,8 @@ on:
   workflow_dispatch:
   
 env:
-  REPOSITORY_NAME: ${{ github.repository_owner }}
+  REPOSITORY_NAME: smirnovalexey 
+  #${{ github.repository_owner }}
   APP_NAME: wcg
   
 jobs:
