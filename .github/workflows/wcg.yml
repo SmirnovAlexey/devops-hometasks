@@ -33,5 +33,5 @@ jobs:
         context: ./07-docker
         file: ./07-docker/Dockerfile.multi
         push: true
-        tags: user/app:latest
+        tags: ghcr.io/wcg:latest
         github-token: ${{ secrets.ACTION_TOKEN }}
