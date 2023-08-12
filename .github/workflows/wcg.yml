@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   
 env:
-  IMAGE_NAME: ghcr.io/smirnovalexey/wcg
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/wcg
   #${{ github.repository_owner }}
   
 jobs:
