@@ -33,5 +33,6 @@ jobs:
         context: ./07-docker
         file: ./07-docker/Dockerfile.multi
         push: true
-        tags: ghcr.io/app:latest
         # tags: ghcr.io/smirnovalexey/app:latest
+        images: ghcr.io/smirnovalexey/wcg
+        tags: latest
