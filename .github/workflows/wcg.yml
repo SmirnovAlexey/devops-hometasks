@@ -25,7 +25,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: ./07-docker
-        file: Dockerfile.multi
+        file: ./07-docker/Dockerfile.multi
         push: true
         tags: wcg1
         labels: wcg
