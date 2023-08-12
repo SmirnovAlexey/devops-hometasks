@@ -35,5 +35,4 @@ jobs:
         push: true
         tags: wcg1
         labels: wcg
-        secrets: |
-          GIT_AUTH_TOKEN=${{ secrets.ACTION_TOKEN }}    
+        github-token: ${{ secrets.ACTION_TOKEN }}
