@@ -32,4 +32,4 @@ jobs:
         context: ./07-docker
         file: ./07-docker/Dockerfile.multi
         push: true
-        tags: ghcr.io/${REPOSITORY_NAME}/${APP_NAME}:latest, ghcr.io/${REPOSITORY_NAME}/${APP_NAME}:${{ github.sha }}
+        tags: ghcr.io/${{ REPOSITORY_NAME }}/${{ APP_NAME }}:latest, ghcr.io/${{ REPOSITORY_NAME }}/${{ APP_NAME }}:${{ github.sha }}
