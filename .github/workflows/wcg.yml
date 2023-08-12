@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   
 env:
-  REPOSITORY_NAME: ${{ GITHUB_REPOSITORY_OWNER }}
+  REPOSITORY_NAME: ${{ var.GITHUB_REPOSITORY_OWNER }}
   APP_NAME: wcg
   
 jobs:
