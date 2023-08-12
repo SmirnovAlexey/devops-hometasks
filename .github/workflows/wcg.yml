@@ -18,6 +18,10 @@ jobs:
 
     - name: github.sha
       run: echo ${{ github.sha }}
+    - name: REPOSITORY_NAME
+      run: echo ${REPOSITORY_NAME}
+    - name: APP_NAME
+      run: echo ${APP_NAME}
           
     - name: Log in to the Container registry
       uses: docker/login-action@v2
