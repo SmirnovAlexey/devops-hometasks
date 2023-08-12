@@ -14,10 +14,8 @@ jobs:
     # - name: Build the Docker image
     #   run: docker build ./07-docker -t wcg -f ./07-docker/Dockerfile.multi
 
-    - name: ACTION_TOKEN
-      run: echo ${{ secrets.ACTION_TOKEN }}
-    - name: actor
-      run: echo ${{ github.actor }}
+    - name: github.sha
+      run: echo ${{ github.sha }}
 
           
     - name: Log in to the Container registry
@@ -33,5 +31,4 @@ jobs:
         context: ./07-docker
         file: ./07-docker/Dockerfile.multi
         push: true
-        # tags: ghcr.io/smirnovalexey/app:latest
-        tags: ghcr.io/smirnovalexey/wcg:latest, ghcr.io/smirnovalexey/wcg:1.1.1
+        tags: ghcr.io/smirnovalexey/wcg:latest, ghcr.io/smirnovalexey/wcg:${{ github.sha }}
