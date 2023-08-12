@@ -33,6 +33,5 @@ jobs:
         context: ./07-docker
         file: ./07-docker/Dockerfile.multi
         push: true
-        tags: wcg1
-        labels: wcg
+        tags: user/app:latest
         github-token: ${{ secrets.ACTION_TOKEN }}
