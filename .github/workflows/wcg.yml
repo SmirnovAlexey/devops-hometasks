@@ -36,4 +36,4 @@ jobs:
         tags: wcg1
         labels: wcg
         secrets: |
-          GIT_AUTH_TOKEN=${{ secrets.ACTION_TOKEN }      
+          GIT_AUTH_TOKEN=${{ secrets.ACTION_TOKEN }}    
