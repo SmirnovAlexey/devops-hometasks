@@ -16,5 +16,5 @@ resource "github_repository_file" "file" {
   commit_message      = "Terraform example"
   commit_author       = "Alexey Smirnov"
   commit_email        = "alexey.work@tut.by"
-  #overwrite_on_create = true
+  overwrite_on_create = true
 }
