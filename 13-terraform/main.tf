@@ -1,5 +1,5 @@
 resource "github_repository_file" "file" {
-  for_each = fileset("${path.module}", "*.tf")
+  for_each = fileset("${path.module}", "*.{tf,tfvars}")
 #  count = length(var.files)
 
   repository          = "devops-hometasks"
