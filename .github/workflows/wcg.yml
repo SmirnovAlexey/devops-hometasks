@@ -30,7 +30,15 @@ jobs:
     - name: Run chart-testing (lint)
       run: |
         helm lint 12-helm/wcg
+
+    - name: Helm package
+      run: |
+        helm package 12-helm/wcg --version ${{ steps.tag_version.outputs.new_tag }} --app-version ${{ steps.tag_version.outputs.new_tag }} -d charts
         
+    # - name: Helm repo index
+    #   run: |
+    #     helm repo index . charts
+          
     - name: Set lower case repository owner name
       run: |
         echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
