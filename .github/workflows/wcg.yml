@@ -38,7 +38,10 @@ jobs:
     # - name: Helm repo index
     #   run: |
     #     helm repo index /charts
-          
+
+    - name: Commit all changed files back to the repository
+      uses: stefanzweifel/git-auto-commit-action@v4    
+         
     - name: Set lower case repository owner name
       run: |
         echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
