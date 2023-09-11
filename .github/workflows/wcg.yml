@@ -1,4 +1,4 @@
-name: CI
+name: Helm Repo
 
 on: 
   workflow_dispatch:
