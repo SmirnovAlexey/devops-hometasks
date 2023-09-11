@@ -1,8 +1,12 @@
 FROM golang:1.16 as builder
 
 RUN apt-get update && apt-get install -y git
+ARG BUILD_VERSION
+ENV BUILD_VERSION=$BUILD_VERSION
+RUN if [ -z "$BUILD_VERSION" ]; then echo 'The BUILD_VERSION environment variable is not specified'; exit 1; fi
 RUN git clone https://github.com/Fenikks/word-cloud-generator.git /tmp/word-cloud-generator
 WORKDIR /tmp/word-cloud-generator
+RUN sed -i "s/1.DEVELOPMENT/$BUILD_VERSION/g" static/version
 RUN make build
 
 FROM alpine:latest
