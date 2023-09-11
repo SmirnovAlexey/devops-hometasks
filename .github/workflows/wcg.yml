@@ -61,7 +61,6 @@ jobs:
         context: ./07-docker
         file: ./07-docker/Dockerfile.multi
         push: true
-        build-args: BUILD_VERSION=${{ steps.tag_version.outputs.new_tag }}
         tags: ${{ env.IMAGE_NAME }}:latest, ${{ env.IMAGE_NAME }}:${{ steps.tag_version.outputs.new_tag }}
       env: 
         IMAGE_NAME: ghcr.io/${{ env.OWNER_LC }}/wcg
