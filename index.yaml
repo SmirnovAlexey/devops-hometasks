@@ -2,8 +2,18 @@ apiVersion: v1
 entries:
   wcg:
   - apiVersion: v2
+    appVersion: v0.0.38
+    created: "2023-09-11T15:00:45.293930998Z"
+    description: A Helm chart for Kubernetes
+    digest: c457e0a9255a64ba25f86a263c9d3fad8f0a240abd2c3f2faa616e5d39c56a1d
+    name: wcg
+    type: application
+    urls:
+    - https://SmirnovAlexey.github.io/devops-hometasks/charts/wcg-v0.0.38.tgz
+    version: v0.0.38
+  - apiVersion: v2
     appVersion: v0.0.37
-    created: "2023-09-11T14:57:29.944966475Z"
+    created: "2023-09-11T15:00:45.293634393Z"
     description: A Helm chart for Kubernetes
     digest: 83df80fdd318f5d2de0ce1a79cb5794564a0a538a682c7654108b0fc838e2473
     name: wcg
@@ -13,7 +23,7 @@ entries:
     version: v0.0.37
   - apiVersion: v2
     appVersion: v0.0.36
-    created: "2023-09-11T14:57:29.94462715Z"
+    created: "2023-09-11T15:00:45.293316587Z"
     description: A Helm chart for Kubernetes
     digest: 392123d368cbf42399cc4dce3b032550837e56675b3e26e363e43add7a83c8d4
     name: wcg
@@ -23,7 +33,7 @@ entries:
     version: v0.0.36
   - apiVersion: v2
     appVersion: v0.0.35
-    created: "2023-09-11T14:57:29.944226321Z"
+    created: "2023-09-11T15:00:45.292877779Z"
     description: A Helm chart for Kubernetes
     digest: dc11d947a6deb43dc9661a5aaffaddfed0980a6c4d4ab7b78a30cbb89285fdfc
     name: wcg
@@ -33,7 +43,7 @@ entries:
     version: v0.0.35
   - apiVersion: v2
     appVersion: v0.0.34
-    created: "2023-09-11T14:57:29.943741285Z"
+    created: "2023-09-11T15:00:45.291739459Z"
     description: A Helm chart for Kubernetes
     digest: 9c66058b2b6a9adf9905a44992a4c6e68cf3ef85bb187d28ee6ad5e10ae26176
     name: wcg
@@ -41,4 +51,4 @@ entries:
     urls:
     - https://SmirnovAlexey.github.io/devops-hometasks/charts/wcg-v0.0.34.tgz
     version: v0.0.34
-generated: "2023-09-11T14:57:29.943031833Z"
+generated: "2023-09-11T15:00:45.291295452Z"
